@@ -8,10 +8,14 @@
     "dev:frontend": "pnpm -filter frontend run dev"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.2"
   },
   "engines": {
     "node": "^20.0.0"
+  },
+  "dependencies": {
+    "mongodb-memory-server": "^9.3.0",
+    "react-router-dom": "^6.23.1"
   }
 }

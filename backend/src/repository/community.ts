@@ -1,6 +1,6 @@
 import {Community, CommunityModel} from '../models/Community';
 
-export const getCommunity = async (id: string) => {
+export const findById = async (id: string) => {
   return CommunityModel.findById(id);
 };
 

@@ -1,17 +1,15 @@
 import {User, UserModel} from '../models/User';
 
-export const getUser = async (id: string) => {
-  return UserModel.findById(id);
+export const findById = async (id: string) => {
+  const user = await UserModel.findById(id);
+
+  return user;
 };
 
-export const getUsers = (populate: string) => {
-  if (!populate) {
-    return UserModel.find();
-  }
-
-  return UserModel.find({}).populate(populate);
+export const find = () => {
+  return UserModel.find();
 };
 
-export const insertUser = async (user: User) => {
+export const create = async (user: User) => {
   return UserModel.create(user);
 };

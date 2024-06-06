@@ -11,8 +11,12 @@ export class User {
   @prop()
   public profilePicture?: string;
 
-  @prop({required: true, select: false, default: []})
-  public experiencePoints?: {points: number; timestamp: Date}[];
+  @prop({
+    required: true,
+    select: true,
+    default: [],
+  })
+  public experiencePoints!: {points: number; timestamp: Date}[];
 
   @prop({
     required: false,
