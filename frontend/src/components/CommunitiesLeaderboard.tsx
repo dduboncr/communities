@@ -49,10 +49,7 @@ const Leaderboard: React.FC = () => {
             <tr key={item._id}>
               <td>{index + 1}</td>
               <td>
-                <img
-                  src={'https://via.placeholder.com/40'}
-                  className="community-logo"
-                />
+                <img src={item.community.logo} className="community-logo" />
                 {'  '}
                 {item.community.name}
               </td>

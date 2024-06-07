@@ -6,8 +6,8 @@ export const findById = async (id: string) => {
   return user;
 };
 
-export const find = () => {
-  return UserModel.find();
+export const find = (filter: Partial<User> = {}) => {
+  return UserModel.find({...filter});
 };
 
 export const create = async (user: User) => {

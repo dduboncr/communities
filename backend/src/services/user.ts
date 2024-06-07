@@ -1,4 +1,5 @@
-import {User, UserModel} from '../models/User';
+import {CommunityModel} from '../models/Community';
+import {User} from '../models/User';
 import * as communityRepository from '../repository/community';
 import * as userRepository from '../repository/user';
 
@@ -9,72 +10,94 @@ export const leaveCommunity = async (userId: string, communityId: string) => {
     throw new Error('User not found');
   }
 
-  if (!user.community) {
-    return user;
+  const community = await communityRepository.findById(communityId);
+
+  if (!community) {
+    throw new Error('Community not found');
   }
 
-  if (user.community._id.toString() !== communityId) {
+  const userInCommunity = community?.users?.find(
+    (userInCommunity) => userInCommunity._id.toString() === userId
+  );
+
+  if (!userInCommunity) {
     throw new Error('User is not in the community');
   }
 
-  user.community = undefined;
+  community.users = community.users.filter(
+    (userInCommunity) => userInCommunity._id.toString() !== userId
+  );
 
+  await community?.save();
+  user.community = undefined;
   await user?.save();
 
-  return user;
+  return community;
 };
 
 export const joinCommunity = async (userId: string, communityId: string) => {
   const user = await userRepository.findById(userId);
 
-  if (user?.community) {
-    console.log('user already in community');
-    throw new Error('User already in a community');
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (user.community) {
+    throw new Error('User is already in a community');
   }
 
   const community = await communityRepository.findById(communityId);
 
-  if (!user || !community) {
-    console.log('user or community not found');
-    return;
+  const userInCommunity = community?.users?.find((user) => {
+    return user._id.toString() === userId;
+  });
+
+  if (userInCommunity) {
+    throw new Error('User is already in the community');
   }
 
+  if (!community) {
+    throw new Error('Community not found');
+  }
+  community.users.push(user);
   user.community = community;
-
   await user?.save();
+  await community?.save();
 
-  return user;
+  return community;
 };
 
 export const getCommunitiesLeaderboard = async () => {
-  const leaderboard = await UserModel.aggregate([
-    {
-      $unwind: '$experiencePoints',
-    },
-    {
-      $group: {
-        _id: '$community',
-        totalExperiencePoints: {$sum: '$experiencePoints.points'},
-        numberOfUsers: {$sum: 1},
-      },
-    },
-    {
-      $lookup: {
-        from: 'communities',
-        localField: '_id',
-        foreignField: '_id',
-        as: 'community',
-      },
-    },
-    {
-      $sort: {totalExperiencePoints: -1},
-    },
-  ]);
+  const leaderboard = await CommunityModel.find({}).populate('users');
 
-  return leaderboard.map((item) => ({
-    ...item,
-    community: item.community[0],
-  }));
+  const rankedLeaderboard: {
+    totalExperiencePoints: number;
+    numberOfUsers: number;
+    community: {name: string; logo: string};
+  }[] = leaderboard
+    .map((community) => {
+      // sum of all users experience points, experience points is array of objects
+      const totalExperiencePoints = (community.users as User[]).reduce(
+        (acc, user) =>
+          acc +
+          user.experiencePoints.reduce((acc, point) => acc + point.points, 0),
+        0
+      );
+
+      const numberOfUsers = community.users.length;
+
+      return {
+        totalExperiencePoints,
+        numberOfUsers,
+        community: {
+          name: community.name,
+          logo: community.logo,
+        },
+      };
+    })
+    .sort((a, b) => b.totalExperiencePoints - a.totalExperiencePoints);
+
+  return rankedLeaderboard;
 };
 
 export const updateExperiencePoints = async (

@@ -2,7 +2,7 @@ import express from 'express';
 import {User, UserModel} from '../models/User';
 import * as userService from '../services/user';
 import * as userRepository from '../repository/user';
-
+import * as communityRepository from '../repository/community';
 const userRouter = express.Router();
 
 /**

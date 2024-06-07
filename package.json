@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "pnpm -r run dev",
     "dev:backend": "pnpm -filter backend run dev",
-    "dev:frontend": "pnpm -filter frontend run dev"
+    "dev:frontend": "pnpm -filter frontend run dev",
+    "db:init": "docker run -d -p 27017-27019:27017-27019 --name mongodb mongo",
+    "db:stop": "docker stop mongodb"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
@@ -15,7 +17,6 @@
     "node": "^20.0.0"
   },
   "dependencies": {
-    "mongodb-memory-server": "^9.3.0",
     "react-router-dom": "^6.23.1"
   }
 }

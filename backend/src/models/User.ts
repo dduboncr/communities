@@ -1,5 +1,5 @@
 import {prop, getModelForClass, Ref} from '@typegoose/typegoose';
-import {Community, CommunityModel} from './Community';
+import {Community} from './Community';
 
 export class User {
   @prop({required: true})
@@ -20,7 +20,8 @@ export class User {
 
   @prop({
     required: false,
-    ref: () => Community,
+    default: undefined,
+    select: true,
   })
   public community?: Ref<Community>;
 }
